@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discharge Summary - Valli Hospital</title>
     <style>
+        /* --- CSS Variables for Real-Time Adjustments --- */
+        :root {
+            --header-size: 26px;
+            --header-weight: 700; /* Bold, but not Extra Black */
+            --header-color: #004e46;
+            --line-thickness: 1px; /* Thinner line */
+            --line-width: 86%;
+            --line-offset: 5%;
+            --line-gap-top: 5px;
+            --line-gap-bottom: 8px;
+        }
+
         /* --- General Reset & Page Setup --- */
         body {
             background-color: #e0e0e0; 
@@ -53,33 +65,42 @@
         .header-content {
             text-align: center;
             flex-grow: 1;
-            padding: 0 10px;
+            padding: 0 5px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding-top: 12px; 
+            padding-top: 15px; 
+            position: relative;
         }
 
         .hospital-name {
-            color: #00685e; 
-            font-size: 26px; 
-            font-weight: 700; 
+            color: var(--header-color);
+            font-size: var(--header-size); 
+            font-weight: var(--header-weight); 
             margin: 0;
             line-height: 1.2;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.2px;
             width: 100%;
-            /* The line separator */
-            border-bottom: 2px solid #444; 
-            padding-bottom: 8px;
-            margin-bottom: 8px;
+            position: relative;
+            margin-bottom: 0; /* Spacing handled by line div */
+        }
+
+        /* Custom Separator Line */
+        .header-line {
+            height: var(--line-thickness);
+            background-color: #444;
+            width: var(--line-width); 
+            margin-left: var(--line-offset); 
+            margin-top: var(--line-gap-top);
+            margin-bottom: var(--line-gap-bottom);
         }
 
         .sub-header {
             color: #222; 
             font-size: 16px;
             margin: 2px 0;
-            font-weight: 400; 
+            font-weight: 500; 
             width: 100%;
         }
 
@@ -99,8 +120,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Precise alignment below the separator line */
-            margin-top: 52px; 
+            margin-top: 45px; 
         }
         .logo-right img {
             max-width: 100%;
@@ -113,7 +133,6 @@
             text-align: center;
             font-weight: 700;
             text-decoration: underline;
-            /* Optimized spacing */
             margin: 15px auto 15px auto; 
             font-size: 14px;
             text-transform: uppercase;
@@ -190,12 +209,47 @@
             display: inline-block;
         }
         [contenteditable]:hover {
-            background-color: rgba(0, 104, 94, 0.05); 
+            background-color: rgba(0, 78, 70, 0.05); 
             cursor: text;
         }
         [contenteditable]:focus {
-            background-color: rgba(0, 104, 94, 0.1);
+            background-color: rgba(0, 78, 70, 0.1);
             border-bottom: 1px dashed #999;
+        }
+
+        /* --- Settings Panel (UI for User) --- */
+        .settings-panel {
+            position: fixed;
+            left: 20px;
+            top: 80px;
+            width: 220px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 2000;
+            font-size: 12px;
+            font-family: sans-serif;
+            border: 1px solid #ddd;
+        }
+        .settings-panel h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #004e46;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .control-group {
+            margin-bottom: 10px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 3px;
+            font-weight: bold;
+            color: #555;
+        }
+        .control-group input[type="range"] {
+            width: 100%;
         }
 
         /* --- Button Container --- */
@@ -210,7 +264,7 @@
 
         .action-btn {
             padding: 12px 20px;
-            background-color: #00685e;
+            background-color: #004e46;
             color: white;
             border: none;
             cursor: pointer;
@@ -221,7 +275,7 @@
             transition: background-color 0.2s;
         }
         .action-btn:hover {
-            background-color: #004d46;
+            background-color: #003832;
         }
         .action-btn.doc-btn {
             background-color: #0056b3; /* Blue for Word */
@@ -245,7 +299,7 @@
                 padding: 10mm 15mm;
                 border: none;
             }
-            .btn-container { 
+            .btn-container, .settings-panel { 
                 display: none; 
             }
             table td {
@@ -255,15 +309,16 @@
         }
     </style>
     <script>
+        function updateStyle(variable, value, unit='') {
+            document.documentElement.style.setProperty(variable, value + unit);
+            // Update display value if we had one, but keeping it simple for now
+        }
+
         function exportToDoc() {
             var header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Discharge Summary</title><style>" + document.getElementsByTagName('style')[0].innerHTML + "</style></head><body>";
             var footer = "</body></html>";
             
-            // Clone the page to manipulate it without affecting the view
             var contentNode = document.querySelector('.page').cloneNode(true);
-            
-            // Note: Images linked locally (logo.png) might appear broken in Word if the document is moved away from the images. 
-            // For a robust portable doc, images would need to be Base64, but this works for basic editing.
             
             var sourceHTML = header + contentNode.innerHTML + footer;
             
@@ -278,6 +333,35 @@
     </script>
 </head>
 <body>
+
+    <!-- SETTINGS PANEL FOR USER ADJUSTMENTS -->
+    <div class="settings-panel">
+        <h3>Design Controls</h3>
+        <div class="control-group">
+            <label>Title Font Weight</label>
+            <input type="range" min="400" max="900" step="100" value="700" oninput="updateStyle('--header-weight', this.value)">
+        </div>
+        <div class="control-group">
+            <label>Title Font Size</label>
+            <input type="range" min="20" max="40" step="1" value="26" oninput="updateStyle('--header-size', this.value, 'px')">
+        </div>
+        <div class="control-group">
+            <label>Line Thickness</label>
+            <input type="range" min="0.5" max="5" step="0.5" value="1" oninput="updateStyle('--line-thickness', this.value, 'px')">
+        </div>
+        <div class="control-group">
+            <label>Line Width (%)</label>
+            <input type="range" min="50" max="100" step="1" value="86" oninput="updateStyle('--line-width', this.value, '%')">
+        </div>
+        <div class="control-group">
+            <label>Line Offset (Left)</label>
+            <input type="range" min="0" max="20" step="1" value="5" oninput="updateStyle('--line-offset', this.value, '%')">
+        </div>
+        <div class="control-group">
+            <label>Gap Below Text</label>
+            <input type="range" min="0" max="20" step="1" value="5" oninput="updateStyle('--line-gap-top', this.value, 'px')">
+        </div>
+    </div>
 
     <div class="btn-container">
         <button class="action-btn" onclick="document.title = 'Discharge_Summary_' + document.getElementById('pt-name').innerText; window.print()">Print / Save PDF</button>
@@ -298,6 +382,8 @@
 
             <div class="header-content">
                 <div class="hospital-name" contenteditable="true">Valli Super Speciality Hospital</div>
+                <!-- Custom line Div for precise control -->
+                <div class="header-line"></div>
                 
                 <div class="sub-header" contenteditable="true">Valli Orthopaedic & Sports Hospital</div>
                 <div class="accreditation" contenteditable="true">NABH Accredited</div>
