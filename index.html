@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discharge Summary - Valli Hospital</title>
+    <style>
+        /* --- Page Setup --- */
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, Helvetica, sans-serif; /* Standard Sans-Serif */
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .page {
+            background-color: white;
+            width: 210mm; /* A4 Width */
+            min-height: 297mm; /* A4 Height */
+            padding: 10mm 15mm; /* Matches margins from scan */
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* --- Header Section --- */
+        header {
+            display: flex;
+            align-items: center; /* Vertically align centers */
+            justify-content: space-between;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .logo-left {
+            width: 140px; /* Adjusted width for the Valli Logo */
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-left img {
+            width: 100%;
+            height: auto;
+        }
+
+        .header-content {
+            text-align: center;
+            flex-grow: 1;
+            padding: 0 10px;
+        }
+
+        /* Main Hospital Name - TEAL GREEN */
+        .hospital-name {
+            color: #00685e; /* Exact Logo Teal */
+            font-size: 26px; /* Large and dominant */
+            font-weight: bold;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        /* Sub-Header - BLACK/DARK GREY */
+        .sub-header {
+            color: #333; /* Dark Grey/Black */
+            font-size: 16px;
+            margin: 4px 0;
+            font-weight: normal;
+        }
+
+        /* Accreditation - RED */
+        .accreditation {
+            color: #d32f2f; /* Standard Medical Red */
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        .nabh-logo {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .nabh-logo img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .doc-title {
+            text-align: center;
+            font-weight: bold;
+            text-decoration: underline;
+            margin: 0 0 15px 0;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- Table Styling --- */
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Merges borders */
+            font-size: 12px; /* Matches document font size */
+            margin-bottom: 25px;
+            color: #000;
+        }
+
+        table, th, td {
+            border: 1px solid black; /* Exact border style */
+        }
+
+        td {
+            padding: 6px 8px; /* Padding to match scan */
+            vertical-align: top;
+            line-height: 1.4;
+        }
+
+        .label {
+            font-weight: bold;
+            white-space: nowrap; /* Prevents "NAME :" from breaking */
+            margin-right: 5px;
+        }
+
+        .val {
+            font-weight: bold;
+        }
+
+        /* --- Medical Content Styling --- */
+        .section {
+            margin-bottom: 18px;
+            font-size: 13px;
+        }
+
+        .section-header {
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        ul {
+            margin: 0;
+            padding-left: 25px; /* Indentation for bullets */
+            list-style-type: disc;
+        }
+
+        li {
+            margin-bottom: 5px;
+            padding-left: 5px;
+        }
+
+        /* Make text editable visual cue */
+        [contenteditable]:hover {
+            background-color: #f9f9f9;
+            cursor: text;
+        }
+        
+        /* --- Print Styles --- */
+        @media print {
+            body { 
+                background: none; 
+                padding: 0; 
+            }
+            .page { 
+                width: 100%; 
+                box-shadow: none; 
+                margin: 0; 
+                padding: 10mm; /* Standard print margin */
+                border: none;
+            }
+            .print-btn { 
+                display: none; 
+            }
+        }
+
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background-color: #00685e; /* Teal Button */
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+
+    <div class="page">
+        
+        <header>
+            <div class="logo-left">
+                <img src="logo.png" alt="Valli Hospital Logo">
+            </div>
+
+            <div class="header-content">
+                <div class="hospital-name" contenteditable="true">Valli Super Speciality Hospital</div>
+                <div class="sub-header" contenteditable="true">Valli Orthopaedic & Sports Hospital</div>
+                <div class="accreditation" contenteditable="true">NABH Accredited</div>
+            </div>
+
+            <div class="nabh-logo">
+                <svg viewBox="0 0 100 100" width="60" height="60">
+                    <circle cx="50" cy="50" r="48" stroke="#d32f2f" stroke-width="2" fill="none"/>
+                    <text x="50" y="55" text-anchor="middle" fill="#d32f2f" font-size="20" font-weight="bold">NABH</text>
+                </svg>
+            </div>
+        </header>
+
+        <div class="doc-title" contenteditable="true">DISCHARGE SUMMARY</div>
+
+        <table>
+            <tr>
+                <td style="width: 45%;">
+                    <span class="label">NAME :</span> <span class="val" contenteditable="true">Mr.TAMILSELVAN.D</span>
+                </td>
+                <td style="width: 25%;">
+                    <span class="label">MRN.NO :</span> <span class="val" contenteditable="true">11948</span>
+                </td>
+                <td style="width: 30%;">
+                    <span class="label">IP.NO :</span> <span class="val" contenteditable="true">25000307</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="label">AGE :</span> <span class="val" contenteditable="true">29 YEARS</span>
+                </td>
+                <td>
+                    <span class="label">SEX :</span> <span class="val" contenteditable="true">MALE</span>
+                </td>
+                <td>
+                    <span class="label">R.NO :</span> <span class="val" contenteditable="true">IP-2</span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" style="padding-top: 10px; padding-bottom: 10px;">
+                    <div style="display: flex;">
+                        <div style="width: 100px;" class="label">ADDRESS :</div>
+                        <div contenteditable="true" style="flex-grow: 1; font-weight: bold;">
+                            S/O.MR. DEVARAJI,<br>
+                            PALLATHUR,<br>
+                            ATHI PADI,<br>
+                            UTHANGARAI,<br>
+                            KRISHNAGIRI.
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <span class="label">PHONE :</span> <span class="val" contenteditable="true">9843904387</span>
+                    </div>
+                </td>
+            </tr>
+            <tr style="background-color: #d9d9d9;"> <td>
+                    <span class="label">D.O.A :</span> <span class="val" contenteditable="true">21/07/25 @ 05:57 PM</span>
+                </td>
+                <td>
+                    <span class="label">D.O.S :</span> <span class="val" contenteditable="true">21/07/25</span>
+                </td>
+                <td>
+                    <span class="label">D.O.D :</span> <span class="val" contenteditable="true">24/07/25 @ 03:00 PM</span>
+                </td>
+            </tr>
+            <tr style="background-color: #d9d9d9;">
+                <td colspan="3">
+                    <span class="label">CONSULTANTS:</span>
+                    <div class="val" contenteditable="true" style="margin-left: 10px; display: inline-block; vertical-align: top;">
+                        DR.T.NATANASABAPATHY MBBS, M.S(ORTHO), FDFM, IOC DSM<br>
+                        DR. AAKASH MBBS., M.S(ORTHO), FIJR, FDFM<br>
+                        DR. S. PRADEEP MBBS, MD(ANESTHESIA)
+                    </div>
+                </td>
+            </tr>
+            <tr style="background-color: #d9d9d9;">
+                <td colspan="3">
+                    <span class="label">ICD CODE</span> 
+                    <span class="val" contenteditable="true" style="margin-left: 100px;">M00.862</span>
+                </td>
+            </tr>
+        </table>
+
+        <div class="section">
+            <div class="section-header">DIAGNOSIS:</div>
+            <ul contenteditable="true">
+                <li class="val">SEPTIC ARTHRITIS - LEFT KNEE</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-header">PROCEDURE:</div>
+            <ul contenteditable="true">
+                <li class="val">ARTHROSCOPIC DEBRIDEMENT - LEFT KNEE</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-header">CHIEF COMPLAINTS:</div>
+            <ul contenteditable="true">
+                <li>Patient came with discharging sinus over operated site</li>
+                <li>Patient came for planned debridement under arthroscopy</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-header">PAST MEDICAL HISTORY:</div>
+            <ul contenteditable="true">
+                <li>Status post Left Arthroscopic ACL Reconstruction x 19 days old</li>
+                <li>Patient is typhoid positive since 14.07.2025 on medications</li>
+                <li>Patient denies other pre existing medical illness & allergies to any medications</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-header">ON EXAMINATION:</div>
+            <ul contenteditable="true">
+                <li>Conscious, Oriented, Afebrile</li>
+                <li>Obese</li>
+            </ul>
+        </div>
+
+    </div>
+
+</body>
+</html>
