@@ -5,22 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discharge Summary - Valli Hospital</title>
     <style>
-        /* --- Page Setup --- */
+        /* --- General Reset & Page Setup --- */
         body {
-            background-color: #f0f0f0;
-            font-family: Arial, Helvetica, sans-serif; /* Standard Sans-Serif */
+            background-color: #e0e0e0; /* darker background for contrast in browser */
+            font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+            margin: 0;
+            padding: 40px;
             display: flex;
             justify-content: center;
-            padding: 20px;
-            margin: 0;
         }
 
         .page {
             background-color: white;
-            width: 210mm; /* A4 Width */
-            min-height: 297mm; /* A4 Height */
-            padding: 10mm 15mm; /* Matches margins from scan */
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            width: 210mm; /* Exact A4 Width */
+            min-height: 297mm; /* Exact A4 Height */
+            padding: 10mm 15mm; /* Top/Bottom: 10mm, Left/Right: 15mm (matching scan margins) */
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
             box-sizing: border-box;
             position: relative;
         }
@@ -28,225 +28,280 @@
         /* --- Header Section --- */
         header {
             display: flex;
-            align-items: center; /* Vertically align centers */
+            align-items: center;
             justify-content: space-between;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             position: relative;
+            padding-bottom: 5px;
         }
 
+        /* Left Logo Area */
         .logo-left {
-            width: 140px; /* Adjusted width for the Valli Logo */
+            width: 100px; /* Fixed width for logo area */
+            height: 100px;
             display: flex;
             align-items: center;
+            justify-content: flex-start;
         }
-
         .logo-left img {
-            width: 100%;
-            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
         }
 
+        /* Center Header Text */
         .header-content {
             text-align: center;
             flex-grow: 1;
             padding: 0 10px;
         }
 
-        /* Main Hospital Name - TEAL GREEN */
         .hospital-name {
-            color: #00685e; /* Exact Logo Teal */
-            font-size: 26px; /* Large and dominant */
-            font-weight: bold;
+            color: #00685e; /* Exact Teal from Logo */
+            font-size: 26px; 
+            font-weight: 700; /* Bold */
             margin: 0;
+            line-height: 1.2;
             letter-spacing: 0.5px;
         }
 
-        /* Sub-Header - BLACK/DARK GREY */
         .sub-header {
-            color: #333; /* Dark Grey/Black */
+            color: #222; /* Very Dark Grey/Black */
             font-size: 16px;
-            margin: 4px 0;
-            font-weight: normal;
+            margin: 5px 0;
+            font-weight: 400; /* Regular weight */
         }
 
-        /* Accreditation - RED */
         .accreditation {
-            color: #d32f2f; /* Standard Medical Red */
+            color: #d32f2f; /* NABH Red */
             font-size: 14px;
-            font-weight: bold;
-            margin-top: 2px;
+            font-weight: 700;
+            margin-top: 4px;
         }
 
-        .nabh-logo {
-            width: 60px;
-            height: 60px;
+        /* Right Logo Area (NABH) */
+        .logo-right {
+            width: 70px;
+            height: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        
-        .nabh-logo img {
+        .logo-right img {
             max-width: 100%;
             max-height: 100%;
+            object-fit: contain;
         }
 
+        /* Discharge Summary Title */
         .doc-title {
             text-align: center;
-            font-weight: bold;
+            font-weight: 700;
             text-decoration: underline;
-            margin: 0 0 15px 0;
-            font-size: 15px;
+            margin: 10px 0 15px 0;
+            font-size: 14px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: #000;
         }
 
         /* --- Table Styling --- */
         table {
             width: 100%;
-            border-collapse: collapse; /* Merges borders */
-            font-size: 12px; /* Matches document font size */
+            border-collapse: collapse;
+            font-size: 12px;
             margin-bottom: 25px;
             color: #000;
+            border: 1px solid #000; /* Outer border */
         }
 
-        table, th, td {
-            border: 1px solid black; /* Exact border style */
-        }
-
-        td {
-            padding: 6px 8px; /* Padding to match scan */
+        table td {
+            border: 1px solid #000; /* Inner borders */
+            padding: 6px 8px;
             vertical-align: top;
             line-height: 1.4;
         }
 
+        /* Table Text Utilities */
         .label {
-            font-weight: bold;
-            white-space: nowrap; /* Prevents "NAME :" from breaking */
+            font-weight: 700; /* Bold labels */
+            white-space: nowrap;
             margin-right: 5px;
         }
 
         .val {
-            font-weight: bold;
+            font-weight: 600; /* Slightly bolder value text */
+            color: #000;
         }
 
-        /* --- Medical Content Styling --- */
+        /* Specific Table Backgrounds */
+        .bg-grey {
+            background-color: #d0d0d0; /* Matches the grey scan rows */
+            /* Note: Ensure background graphics are enabled when printing */
+            -webkit-print-color-adjust: exact; 
+            print-color-adjust: exact;
+        }
+
+        /* --- Medical Content Sections --- */
         .section {
-            margin-bottom: 18px;
+            margin-bottom: 15px;
             font-size: 13px;
+            line-height: 1.5;
+            color: #000;
         }
 
         .section-header {
-            font-weight: bold;
+            font-weight: 700;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             font-size: 13px;
         }
 
+        /* List Styling */
         ul {
             margin: 0;
-            padding-left: 25px; /* Indentation for bullets */
+            padding-left: 25px;
             list-style-type: disc;
         }
 
         li {
-            margin-bottom: 5px;
-            padding-left: 5px;
+            margin-bottom: 4px;
+            padding-left: 2px;
         }
 
-        /* Make text editable visual cue */
+        li::marker {
+            font-size: 10px; /* Smaller bullets */
+        }
+
+        /* --- Editor Interaction --- */
+        [contenteditable] {
+            outline: none;
+            min-width: 20px;
+            display: inline-block;
+        }
         [contenteditable]:hover {
-            background-color: #f9f9f9;
+            background-color: rgba(0, 104, 94, 0.05); /* Very faint teal hover */
             cursor: text;
         }
-        
-        /* --- Print Styles --- */
-        @media print {
-            body { 
-                background: none; 
-                padding: 0; 
-            }
-            .page { 
-                width: 100%; 
-                box-shadow: none; 
-                margin: 0; 
-                padding: 10mm; /* Standard print margin */
-                border: none;
-            }
-            .print-btn { 
-                display: none; 
-            }
+        [contenteditable]:focus {
+            background-color: rgba(0, 104, 94, 0.1);
+            border-bottom: 1px dashed #999;
         }
 
+        /* --- Print Button --- */
         .print-btn {
             position: fixed;
             top: 20px;
             right: 20px;
             padding: 12px 24px;
-            background-color: #00685e; /* Teal Button */
+            background-color: #00685e;
             color: white;
             border: none;
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
             border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.2s;
+            z-index: 1000;
+        }
+        .print-btn:hover {
+            background-color: #004d46;
+        }
+
+        /* --- Print Media Query (Crucial for correct output) --- */
+        @media print {
+            body { 
+                background: none; 
+                padding: 0; 
+                margin: 0;
+            }
+            .page { 
+                width: 100%; 
+                height: auto; 
+                box-shadow: none; 
+                margin: 0; 
+                padding: 10mm 15mm;
+                border: none;
+            }
+            .print-btn { 
+                display: none; 
+            }
+            /* Force background colors to print */
+            .bg-grey {
+                background-color: #d0d0d0 !important;
+                -webkit-print-color-adjust: exact;
+            }
         }
     </style>
 </head>
 <body>
 
-    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+    <button class="print-btn" onclick="document.title = 'Discharge_Summary_' + document.getElementById('pt-name').innerText; window.print()">Print / Save PDF</button>
 
     <div class="page">
         
+        <!-- HEADER -->
         <header>
+            <!-- Left Logo: Looks for 'logo.png' in the same folder -->
             <div class="logo-left">
-                <img src="logo.png" alt="Valli Hospital Logo">
+                <img src="logo.png" alt="Hospital Logo" onerror="this.style.display='none'; document.getElementById('logo-placeholder').style.display='flex'">
+                <!-- Fallback if image missing -->
+                <div id="logo-placeholder" style="display:none; width:100%; height:100%; background:#eee; color:#666; font-size:10px; align-items:center; justify-content:center; text-align:center;">
+                    Add logo.png
+                </div>
             </div>
 
             <div class="header-content">
                 <div class="hospital-name" contenteditable="true">Valli Super Speciality Hospital</div>
+                <!-- Subtext matches scan perfectly -->
                 <div class="sub-header" contenteditable="true">Valli Orthopaedic & Sports Hospital</div>
                 <div class="accreditation" contenteditable="true">NABH Accredited</div>
             </div>
 
-            <div class="nabh-logo">
-                <svg viewBox="0 0 100 100" width="60" height="60">
-                    <circle cx="50" cy="50" r="48" stroke="#d32f2f" stroke-width="2" fill="none"/>
-                    <text x="50" y="55" text-anchor="middle" fill="#d32f2f" font-size="20" font-weight="bold">NABH</text>
-                </svg>
+            <!-- Right Logo: Looks for 'nabh.png' -->
+            <div class="logo-right">
+                <img src="nabh.png" alt="NABH Logo" onerror="this.style.display='none'; document.getElementById('nabh-placeholder').style.display='flex'">
+                <!-- Fallback if image missing -->
+                <div id="nabh-placeholder" style="display:none; width:100%; height:100%; border-radius:50%; background:#eee; color:#666; font-size:9px; align-items:center; justify-content:center; text-align:center;">
+                    Add nabh.png
+                </div>
             </div>
         </header>
 
         <div class="doc-title" contenteditable="true">DISCHARGE SUMMARY</div>
 
+        <!-- TABLE SECTION -->
         <table>
+            <!-- Row 1: Name, MRN, IP -->
             <tr>
                 <td style="width: 45%;">
-                    <span class="label">NAME :</span> <span class="val" contenteditable="true">Mr.TAMILSELVAN.D</span>
+                    <span class="label">NAME</span>: <span class="val" id="pt-name" contenteditable="true">Mr.TAMILSELVAN.D</span>
                 </td>
                 <td style="width: 25%;">
-                    <span class="label">MRN.NO :</span> <span class="val" contenteditable="true">11948</span>
+                    <span class="label">MRN.NO</span>: <span class="val" contenteditable="true">11948</span>
                 </td>
                 <td style="width: 30%;">
-                    <span class="label">IP.NO :</span> <span class="val" contenteditable="true">25000307</span>
+                    <span class="label">IP.NO</span>: <span class="val" contenteditable="true">25000307</span>
                 </td>
             </tr>
+            <!-- Row 2: Age, Sex, Room -->
             <tr>
                 <td>
-                    <span class="label">AGE :</span> <span class="val" contenteditable="true">29 YEARS</span>
+                    <span class="label">AGE</span>: <span class="val" contenteditable="true">29 YEARS</span>
                 </td>
                 <td>
-                    <span class="label">SEX :</span> <span class="val" contenteditable="true">MALE</span>
+                    <span class="label">SEX</span>: <span class="val" contenteditable="true">MALE</span>
                 </td>
                 <td>
-                    <span class="label">R.NO :</span> <span class="val" contenteditable="true">IP-2</span>
+                    <span class="label">R.NO</span>: <span class="val" contenteditable="true">IP-2</span>
                 </td>
             </tr>
+            <!-- Row 3: Address & Phone (Spans all columns, specific layout) -->
             <tr>
-                <td colspan="3" style="padding-top: 10px; padding-bottom: 10px;">
+                <td colspan="3" style="padding-bottom: 5px;">
                     <div style="display: flex;">
-                        <div style="width: 100px;" class="label">ADDRESS :</div>
-                        <div contenteditable="true" style="flex-grow: 1; font-weight: bold;">
+                        <div style="width: 85px;" class="label">ADDRESS :</div>
+                        <div contenteditable="true" style="flex-grow: 1; font-weight: 600; line-height: 1.5;">
                             S/O.MR. DEVARAJI,<br>
                             PALLATHUR,<br>
                             ATHI PADI,<br>
@@ -254,50 +309,56 @@
                             KRISHNAGIRI.
                         </div>
                     </div>
-                    <div style="margin-top: 10px;">
-                        <span class="label">PHONE :</span> <span class="val" contenteditable="true">9843904387</span>
+                    <div style="margin-top: 8px;">
+                        <span class="label">PHONE</span>: <span class="val" contenteditable="true">9843904387</span>
                     </div>
                 </td>
             </tr>
-            <tr style="background-color: #d9d9d9;"> <td>
-                    <span class="label">D.O.A :</span> <span class="val" contenteditable="true">21/07/25 @ 05:57 PM</span>
+            <!-- Row 4: DOA, DOS, DOD (Grey Background) -->
+            <tr class="bg-grey">
+                <td>
+                    <span class="label">D.O.A</span>: <span class="val" contenteditable="true">21/07/25 @ 05:57 PM</span>
                 </td>
                 <td>
-                    <span class="label">D.O.S :</span> <span class="val" contenteditable="true">21/07/25</span>
+                    <span class="label">D.O.S</span>: <span class="val" contenteditable="true">21/07/25</span>
                 </td>
                 <td>
-                    <span class="label">D.O.D :</span> <span class="val" contenteditable="true">24/07/25 @ 03:00 PM</span>
+                    <span class="label">D.O.D</span>: <span class="val" contenteditable="true">24/07/25 @ 03:00 PM</span>
                 </td>
             </tr>
-            <tr style="background-color: #d9d9d9;">
+            <!-- Row 5: Consultants (Grey Background, Merged) -->
+            <tr class="bg-grey">
                 <td colspan="3">
                     <span class="label">CONSULTANTS:</span>
-                    <div class="val" contenteditable="true" style="margin-left: 10px; display: inline-block; vertical-align: top;">
+                    <div class="val" contenteditable="true" style="margin-left: 5px; display: inline-block; vertical-align: top;">
                         DR.T.NATANASABAPATHY MBBS, M.S(ORTHO), FDFM, IOC DSM<br>
                         DR. AAKASH MBBS., M.S(ORTHO), FIJR, FDFM<br>
                         DR. S. PRADEEP MBBS, MD(ANESTHESIA)
                     </div>
                 </td>
             </tr>
-            <tr style="background-color: #d9d9d9;">
+            <!-- Row 6: ICD Code (Grey Background, Merged) -->
+            <tr class="bg-grey">
                 <td colspan="3">
                     <span class="label">ICD CODE</span> 
-                    <span class="val" contenteditable="true" style="margin-left: 100px;">M00.862</span>
+                    <span class="val" contenteditable="true" style="margin-left: 140px;">M00.862</span>
                 </td>
             </tr>
         </table>
 
+        <!-- MEDICAL CONTENT -->
+        
         <div class="section">
             <div class="section-header">DIAGNOSIS:</div>
             <ul contenteditable="true">
-                <li class="val">SEPTIC ARTHRITIS - LEFT KNEE</li>
+                <li class="val"><b>SEPTIC ARTHRITIS - LEFT KNEE</b></li>
             </ul>
         </div>
 
         <div class="section">
             <div class="section-header">PROCEDURE:</div>
             <ul contenteditable="true">
-                <li class="val">ARTHROSCOPIC DEBRIDEMENT - LEFT KNEE</li>
+                <li class="val"><b>ARTHROSCOPIC DEBRIDEMENT - LEFT KNEE</b></li>
             </ul>
         </div>
 
@@ -325,6 +386,9 @@
                 <li>Obese</li>
             </ul>
         </div>
+        
+        <!-- Footer Spacer if needed -->
+        <div style="height: 50px;"></div>
 
     </div>
 
