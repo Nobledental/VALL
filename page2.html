@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discharge Summary - Page 2</title>
+    <style>
+        /* --- Page Settings --- */
+        body { background-color: #e0e0e0; font-family: Arial, sans-serif; margin: 0; padding: 40px; display: flex; justify-content: center; }
+        .page { background-color: white; width: 210mm; min-height: 297mm; padding: 15mm 20mm; box-shadow: 0 0 15px rgba(0,0,0,0.2); box-sizing: border-box; position: relative; }
+        
+        /* --- Typography & Spacing --- */
+        .section { margin-bottom: 25px; font-size: 13px; line-height: 1.4; color: #000; }
+        .section-header { font-weight: 700; text-transform: uppercase; margin-bottom: 8px; font-size: 13px; }
+        
+        /* Sub-section headers (e.g., Respiratory System :) */
+        .sub-header { font-weight: 700; margin-top: 15px; margin-bottom: 5px; display: block; }
+        
+        /* List Styling */
+        ul { margin: 0; padding-left: 35px; list-style-type: disc; margin-bottom: 5px; }
+        
+        /* Tighter row spacing inside lists */
+        li { margin-bottom: 4px; padding-left: 5px; }
+        li::marker { font-size: 10px; }
+
+        /* Course in Hospital Paragraph - Exact Alignment */
+        .paragraph {
+            text-align: justify;
+            text-indent: 50px; 
+            line-height: 1.6;
+            margin-top: 10px;
+            margin-left: 70px; 
+        }
+
+        /* --- UI Controls (Hidden on Print) --- */
+        .btn-container { position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 1000; }
+        .action-btn { padding: 12px 20px; background-color: #004e46; color: white; border: none; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 4px; text-decoration: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: background-color 0.2s; display: inline-block; }
+        .action-btn:hover { background-color: #003832; }
+        
+        /* Word Export Button Style */
+        .action-btn.doc-btn { background-color: #0056b3; }
+        .action-btn.doc-btn:hover { background-color: #004494; }
+        
+        .nav-btn { background-color: #555; }
+        .nav-btn:hover { background-color: #333; }
+
+        [contenteditable]:hover { background-color: rgba(0, 0, 0, 0.05); cursor: text; outline: none; }
+        [contenteditable]:focus { background-color: rgba(0, 0, 0, 0.05); outline: none; }
+
+        @media print {
+            body { background: none; padding: 0; margin: 0; }
+            .page { width: 100%; height: auto; box-shadow: none; margin: 0; padding: 15mm 20mm; border: none; }
+            .btn-container { display: none; }
+        }
+    </style>
+    <script>
+        function exportToDoc() {
+            var header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Discharge Summary</title><style>" + document.getElementsByTagName('style')[0].innerHTML + "</style></head><body>";
+            var footer = "</body></html>";
+            
+            // Clone the page to manipulate it without affecting the view
+            var contentNode = document.querySelector('.page').cloneNode(true);
+            
+            var sourceHTML = header + contentNode.innerHTML + footer;
+            
+            var source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+            var fileDownload = document.createElement("a");
+            document.body.appendChild(fileDownload);
+            fileDownload.href = source;
+            fileDownload.download = 'Discharge_Summary_Page2.doc';
+            fileDownload.click();
+            document.body.removeChild(fileDownload);
+        }
+    </script>
+</head>
+<body>
+
+    <div class="btn-container">
+        <a href="index.html" class="action-btn nav-btn">&larr; Back to Page 1</a>
+        <button class="action-btn" onclick="window.print()">Print Page 2</button>
+        <button class="action-btn doc-btn" onclick="exportToDoc()">Export as DOC</button>
+    </div>
+
+    <div class="page">
+        <!-- Content starts directly, NO Header -->
+        
+        <div class="section" style="margin-top: 0;">
+            <div class="section-header">VITALS:</div>
+            <ul contenteditable="true">
+                <li>Pulse rate - 82 bts /min</li>
+                <li>Blood pressure - 120/80 mmHg</li>
+                <li>Respiratory rate - 20/min</li>
+                <li>Saturation - 98% on room air</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-header">SYSTEMIC EXAMINATION:</div>
+            
+            <div contenteditable="true">
+                <span class="sub-header" style="margin-top: 5px;">Respiratory System :</span>
+                <ul>
+                    <li>Bilateral air entry equal</li>
+                    <li>No added sounds</li>
+                </ul>
+
+                <span class="sub-header">Cardio Vascular System :</span>
+                <ul>
+                    <li>S1, S2 (+)</li>
+                    <li>No Murmur</li>
+                </ul>
+
+                <span class="sub-header">Per Abdomen :</span>
+                <ul>
+                    <li>Soft, Bowel Sounds (+)</li>
+                    <li>No tenderness</li>
+                </ul>
+
+                <span class="sub-header">Central Nervous System :</span>
+                <ul>
+                    <li>No Focal Neurological Deficit</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">LOCAL EXAMINATION:</div>
+            <div contenteditable="true">
+                <span class="sub-header" style="margin-top: 5px;">Left Knee:</span>
+                <ul>
+                    <li>Tenderness +</li>
+                    <li>Pus discharge from both portals</li>
+                    <li>Graft site wound edematous with serous discharge / Sutures intact</li>
+                    <li>Active ankle / toe movement</li>
+                    <li>No distal neurovascular deficit</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">INVESTIGATION:</div>
+            <ul contenteditable="true">
+                <li>Enclosed</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-header">COURSE IN THE HOSPITAL:</div>
+            <div class="paragraph" contenteditable="true">
+                Mr. Tamil selvan, 29 years male was admitted with above mentioned complaints. By clinical and radiological examination supported by investigations, He was diagnosed with Left Septic Knee Arthritis, Status post Left Arthroscopic ACL Reconstruction x 19 days old and was advised to undergo Arthroscopic Debridement - Left Knee. After acquiring consent, patient underwent the same and withstood the Procedure well. Intra OP Pus sample was collected and sent for Culture & Sensitivity. He was supported with Antibiotics (Inj. Cefoparazone + Sulbactum), Analgesics, Proton pump inhibitors, Anti emetics, Knee brace support, Vac application, Wound care & Physiotherapy. His Culture report shown no Microbial growth. Patient recovered well and discharged with following advice.
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
