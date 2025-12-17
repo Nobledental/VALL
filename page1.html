@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discharge Summary - Valli Hospital</title>
+    <title>Discharge Summary - Page 1</title>
     <style>
         /* --- CSS Variables for Real-Time Adjustments --- */
         :root {
             --header-size: 26px;
-            --header-weight: 700; /* Bold, but not Extra Black */
+            --header-weight: 700;
             --header-color: #004e46;
-            --line-thickness: 1px; /* Thinner line */
+            --line-thickness: 1px;
             --line-width: 86%;
             --line-offset: 5%;
             --line-gap-top: 5px;
@@ -47,18 +47,21 @@
             padding-bottom: 5px;
         }
 
-        /* Left Logo Area */
+        /* Left Logo Area - Now Draggable via inline style or JS if expanded */
         .logo-left {
             width: 120px; 
             height: 100px;
             display: flex;
             align-items: center; 
             justify-content: flex-start;
+            position: relative; /* Setup for manual offsets if needed */
+            cursor: move; /* Indicates it can be moved */
         }
         .logo-left img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
+            pointer-events: none; /* Allows dragging the div without dragging the image phantom */
         }
 
         /* Center Header Text */
@@ -83,7 +86,7 @@
             letter-spacing: 0.2px;
             width: 100%;
             position: relative;
-            margin-bottom: 0; /* Spacing handled by line div */
+            margin-bottom: 0;
         }
 
         /* Custom Separator Line */
@@ -121,11 +124,14 @@
             align-items: center;
             justify-content: center;
             margin-top: 45px; 
+            cursor: move;
+            position: relative;
         }
         .logo-right img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
+            pointer-events: none;
         }
 
         /* Discharge Summary Title */
@@ -217,40 +223,25 @@
             border-bottom: 1px dashed #999;
         }
 
-        /* --- Settings Panel (UI for User) --- */
-        .settings-panel {
+        /* --- Floating Adjuster Panel (Logos) --- */
+        .adjust-panel {
             position: fixed;
+            top: 20px;
             left: 20px;
-            top: 80px;
-            width: 220px;
-            background: #fff;
+            background: rgba(255, 255, 255, 0.95);
             padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            z-index: 2000;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
             font-size: 12px;
             font-family: sans-serif;
-            border: 1px solid #ddd;
+            width: 250px;
         }
-        .settings-panel h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            color: #004e46;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-        }
-        .control-group {
-            margin-bottom: 10px;
-        }
-        .control-group label {
-            display: block;
-            margin-bottom: 3px;
-            font-weight: bold;
-            color: #555;
-        }
-        .control-group input[type="range"] {
-            width: 100%;
-        }
+        .adjust-panel h4 { margin: 0 0 10px 0; color: var(--header-color); border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .adj-row { display: flex; justify-content: space-between; margin-bottom: 5px; align-items: center; }
+        .adj-row label { font-weight: bold; color: #555; }
+        .adj-row input { width: 60px; }
 
         /* --- Button Container --- */
         .btn-container {
@@ -274,54 +265,38 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: background-color 0.2s;
         }
-        .action-btn:hover {
-            background-color: #003832;
-        }
-        .action-btn.doc-btn {
-            background-color: #0056b3; /* Blue for Word */
-        }
-        .action-btn.doc-btn:hover {
-            background-color: #004494;
-        }
+        .action-btn:hover { background-color: #003832; }
+        .action-btn.doc-btn { background-color: #0056b3; }
+        .action-btn.doc-btn:hover { background-color: #004494; }
 
         /* --- Print Media Query --- */
         @media print {
-            body { 
-                background: none; 
-                padding: 0; 
-                margin: 0;
-            }
-            .page { 
-                width: 100%; 
-                height: auto; 
-                box-shadow: none; 
-                margin: 0; 
-                padding: 10mm 15mm;
-                border: none;
-            }
-            .btn-container, .settings-panel { 
-                display: none; 
-            }
-            table td {
-                background-color: white !important;
-                -webkit-print-color-adjust: exact;
-            }
+            body { background: none; padding: 0; margin: 0; }
+            .page { width: 100%; height: auto; box-shadow: none; margin: 0; padding: 10mm 15mm; border: none; }
+            .btn-container, .adjust-panel { display: none; }
+            table td { background-color: white !important; -webkit-print-color-adjust: exact; }
         }
     </style>
     <script>
         function updateStyle(variable, value, unit='') {
             document.documentElement.style.setProperty(variable, value + unit);
-            // Update display value if we had one, but keeping it simple for now
+        }
+
+        // Functions to move logos relative to their original position
+        function moveLogo(side, axis, val) {
+            const el = document.querySelector(side === 'left' ? '.logo-left' : '.logo-right');
+            if (axis === 'x') {
+                el.style.left = val + 'px';
+            } else {
+                el.style.top = val + 'px';
+            }
         }
 
         function exportToDoc() {
             var header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Discharge Summary</title><style>" + document.getElementsByTagName('style')[0].innerHTML + "</style></head><body>";
             var footer = "</body></html>";
-            
             var contentNode = document.querySelector('.page').cloneNode(true);
-            
             var sourceHTML = header + contentNode.innerHTML + footer;
-            
             var source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
             var fileDownload = document.createElement("a");
             document.body.appendChild(fileDownload);
@@ -334,32 +309,29 @@
 </head>
 <body>
 
-    <!-- SETTINGS PANEL FOR USER ADJUSTMENTS -->
-    <div class="settings-panel">
-        <h3>Design Controls</h3>
-        <div class="control-group">
-            <label>Title Font Weight</label>
-            <input type="range" min="400" max="900" step="100" value="700" oninput="updateStyle('--header-weight', this.value)">
+    <div class="adjust-panel">
+        <h4>Logo Position Adjuster</h4>
+        
+        <div style="margin-bottom: 10px; font-weight: bold; color: #333;">Left Logo (Hospital)</div>
+        <div class="adj-row">
+            <label>Horizontal (X)</label>
+            <input type="number" value="0" oninput="moveLogo('left', 'x', this.value)">
         </div>
-        <div class="control-group">
-            <label>Title Font Size</label>
-            <input type="range" min="20" max="40" step="1" value="26" oninput="updateStyle('--header-size', this.value, 'px')">
+        <div class="adj-row">
+            <label>Vertical (Y)</label>
+            <input type="number" value="0" oninput="moveLogo('left', 'y', this.value)">
         </div>
-        <div class="control-group">
-            <label>Line Thickness</label>
-            <input type="range" min="0.5" max="5" step="0.5" value="1" oninput="updateStyle('--line-thickness', this.value, 'px')">
+
+        <div style="margin-top: 15px; margin-bottom: 10px; font-weight: bold; color: #333;">Right Logo (NABH)</div>
+        <div class="adj-row">
+            <label>Horizontal (X)</label>
+            <input type="number" value="0" oninput="moveLogo('right', 'x', this.value)">
         </div>
-        <div class="control-group">
-            <label>Line Width (%)</label>
-            <input type="range" min="50" max="100" step="1" value="86" oninput="updateStyle('--line-width', this.value, '%')">
-        </div>
-        <div class="control-group">
-            <label>Line Offset (Left)</label>
-            <input type="range" min="0" max="20" step="1" value="5" oninput="updateStyle('--line-offset', this.value, '%')">
-        </div>
-        <div class="control-group">
-            <label>Gap Below Text</label>
-            <input type="range" min="0" max="20" step="1" value="5" oninput="updateStyle('--line-gap-top', this.value, 'px')">
+        <div class="adj-row">
+            <label>Vertical (Y)</label>
+            <input type="number" value="0" oninput="moveLogo('right', 'y', this.value)"> </div>
+        <div style="margin-top:10px; font-size:10px; color:#666;">
+            Note: Positive Y moves down, Negative Y moves up.
         </div>
     </div>
 
@@ -370,10 +342,8 @@
 
     <div class="page">
         
-        <!-- HEADER -->
         <header>
-            <!-- Left Logo -->
-            <div class="logo-left">
+            <div class="logo-left" style="position: relative; top: 0; left: 0;">
                 <img src="logo.png" alt="Hospital Logo" onerror="this.style.display='none'; document.getElementById('logo-placeholder').style.display='flex'">
                 <div id="logo-placeholder" style="display:none; width:100%; height:100%; background:#eee; color:#666; font-size:10px; align-items:center; justify-content:center; text-align:center;">
                     Add logo.png
@@ -382,15 +352,13 @@
 
             <div class="header-content">
                 <div class="hospital-name" contenteditable="true">Valli Super Speciality Hospital</div>
-                <!-- Custom line Div for precise control -->
                 <div class="header-line"></div>
                 
                 <div class="sub-header" contenteditable="true">Valli Orthopaedic & Sports Hospital</div>
                 <div class="accreditation" contenteditable="true">NABH Accredited</div>
             </div>
 
-            <!-- Right Logo -->
-            <div class="logo-right">
+            <div class="logo-right" style="position: relative; top: 0; left: 0;">
                 <img src="nabh.png" alt="NABH Logo" onerror="this.style.display='none'; document.getElementById('nabh-placeholder').style.display='flex'">
                 <div id="nabh-placeholder" style="display:none; width:100%; height:100%; border-radius:50%; background:#eee; color:#666; font-size:9px; align-items:center; justify-content:center; text-align:center;">
                     Add nabh.png
@@ -400,9 +368,7 @@
 
         <div class="doc-title" contenteditable="true">DISCHARGE SUMMARY</div>
 
-        <!-- TABLE SECTION -->
         <table>
-            <!-- Row 1: Name, MRN, IP -->
             <tr>
                 <td style="width: 45%;">
                     <span class="label">NAME</span>: <span class="val" id="pt-name" contenteditable="true">Mr.TAMILSELVAN.D</span>
@@ -414,7 +380,6 @@
                     <span class="label">IP.NO</span>: <span class="val" contenteditable="true">25000307</span>
                 </td>
             </tr>
-            <!-- Row 2: Age, Sex, Room -->
             <tr>
                 <td>
                     <span class="label">AGE</span>: <span class="val" contenteditable="true">29 YEARS</span>
@@ -426,7 +391,6 @@
                     <span class="label">R.NO</span>: <span class="val" contenteditable="true">IP-2</span>
                 </td>
             </tr>
-            <!-- Row 3: Address & Phone -->
             <tr>
                 <td colspan="3" style="padding-bottom: 5px;">
                     <div style="display: flex;">
@@ -444,7 +408,6 @@
                     </div>
                 </td>
             </tr>
-            <!-- Row 4: DOA, DOS, DOD -->
             <tr>
                 <td>
                     <span class="label">D.O.A</span>: <span class="val" contenteditable="true">21/07/25 @ 05:57 PM</span>
@@ -456,7 +419,6 @@
                     <span class="label">D.O.D</span>: <span class="val" contenteditable="true">24/07/25 @ 03:00 PM</span>
                 </td>
             </tr>
-            <!-- Row 5: Consultants -->
             <tr>
                 <td colspan="3">
                     <span class="label">CONSULTANTS:</span>
@@ -467,7 +429,6 @@
                     </div>
                 </td>
             </tr>
-            <!-- Row 6: ICD Code -->
             <tr>
                 <td colspan="3">
                     <span class="label">ICD CODE</span> 
@@ -476,8 +437,6 @@
             </tr>
         </table>
 
-        <!-- MEDICAL CONTENT -->
-        
         <div class="section">
             <div class="section-header">DIAGNOSIS:</div>
             <ul contenteditable="true">
