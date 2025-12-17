@@ -3,283 +3,394 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discharge Summary - Editable PPT</title>
+    <title>Valli Hospital - Designer Mode</title>
     
+    <!-- PPT Generation Library -->
     <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 
     <style>
-        /* --- COPY OF YOUR 100% MATCH STYLES --- */
-        :root { --green: #1b5e20; --red: #d32f2f; }
-        body { background-color: #e0e0e0; font-family: Arial, sans-serif; margin: 0; padding: 40px; display: flex; justify-content: center; }
-        .page { background-color: white; width: 210mm; min-height: 297mm; padding: 15mm 15mm; box-shadow: 0 0 15px rgba(0,0,0,0.2); box-sizing: border-box; position: relative; }
-        
-        /* Headers */
-        header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-        .header-center { text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; }
-        .h-main { color: var(--green); font-size: 26px; font-weight: 700; margin: 0; line-height: 1.2; }
-        .header-line { width: 85%; height: 1px; background-color: #000; margin: 5px 0; }
-        .h-sub { color: #000; font-size: 17px; font-weight: 600; margin: 0; }
-        .h-nabh { color: var(--red); font-size: 14px; font-weight: 700; margin-top: 5px; }
-        .logo-box { width: 80px; height: 80px; background: #f4f4f4; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #999; border: 1px dashed #ccc; }
-        .doc-title { text-align: center; font-weight: 700; text-decoration: underline; font-size: 13px; margin-bottom: 5px; color: #000; text-transform: uppercase; }
-
-        /* Table */
-        table { width: 100%; border-collapse: collapse; font-size: 12px; color: #000; border: 1.5px solid #000; margin-bottom: 20px; table-layout: fixed; }
-        td { border: 1px solid #000; padding: 6px 8px; vertical-align: top; line-height: 1.4; }
-        .col-1 { width: 45%; } .col-2 { width: 25%; } .col-3 { width: 30%; }
-        .lbl-short { font-weight: 700; float: left; margin-right: 5px; }
-        .val { font-weight: 600; color: #000; }
-
-        /* Lists */
-        .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; margin-top: 15px; margin-bottom: 5px; color: #000; }
-        ul { margin: 0; padding-left: 30px; list-style-type: disc; }
-        li { font-size: 12px; font-weight: 500; margin-bottom: 4px; color: #000; }
-
-        /* Controls */
-        .btn-container { position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 2000; }
-        .action-btn { padding: 12px 20px; background-color: #d24726; color: white; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .action-btn:hover { background-color: #b03518; }
-        .print-btn { background-color: #004e46; }
-
-        [contenteditable]:hover { background: #f0f8ff; cursor: text; outline: 1px dashed #ccc; }
-    </style>
-
-    <script>
-        // --- THIS FUNCTION GENERATES THE EDITABLE PPT ---
-        function generateEditablePPT() {
-            let pptx = new PptxGenJS();
+        /* --- CORE VARIABLES (Controlled by Sliders) --- */
+        :root {
+            --base-font-size: 11.5pt;
+            --line-height: 1.3;
+            --header-scale: 1;
+            --label-width: 80px; /* Controls alignment of "NAME:", "AGE:" etc */
+            --cell-padding: 4px;
+            --table-border-width: 1px;
             
-            // 1. Set A4 Page Size (approx 8.27 x 11.69 inches)
-            pptx.layout = 'A4';
-            let slide = pptx.addSlide();
-
-            // --- HEADER ---
-            // Main Title
-            slide.addText("Valli Super Speciality Hospital", { 
-                x: 0.5, y: 0.5, w: 7.27, h: 0.5, 
-                fontSize: 24, color: '1b5e20', bold: true, align: 'center', fontFace: 'Arial' 
-            });
-            
-            // Line
-            slide.addShape(pptx.ShapeType.line, { x: 1.0, y: 1.0, w: 6.27, h: 0, line: { color: '000000', width: 1 } });
-            
-            // Sub Title
-            slide.addText("Valli Orthopaedic & Sports Hospital", { 
-                x: 0.5, y: 1.05, w: 7.27, h: 0.3, 
-                fontSize: 16, color: '000000', bold: true, align: 'center', fontFace: 'Arial' 
-            });
-
-            // NABH
-            slide.addText("NABH Accredited", { 
-                x: 0.5, y: 1.35, w: 7.27, h: 0.3, 
-                fontSize: 12, color: 'd32f2f', bold: true, align: 'center', fontFace: 'Arial' 
-            });
-
-            // Doc Title
-            slide.addText("DISCHARGE SUMMARY", { 
-                x: 0.5, y: 1.8, w: 7.27, h: 0.3, 
-                fontSize: 12, color: '000000', bold: true, underline: true, align: 'center', fontFace: 'Arial' 
-            });
-
-            // --- DATA EXTRACTION ---
-            // We grab the text exactly as it is on the screen right now
-            let name = document.getElementById('val-name').innerText;
-            let mrn = document.getElementById('val-mrn').innerText;
-            let ip = document.getElementById('val-ip').innerText;
-            let age = document.getElementById('val-age').innerText;
-            let sex = document.getElementById('val-sex').innerText;
-            let room = document.getElementById('val-room').innerText;
-            let address = document.getElementById('val-address').innerText; // Grabs multi-line text
-            let phone = document.getElementById('val-phone').innerText;
-            let consultants = document.getElementById('val-consultants').innerText;
-            let icd = document.getElementById('val-icd').innerText;
-            
-            // --- TABLE GENERATION ---
-            // PptxGenJS Table Rows
-            let rows = [
-                // Row 1
-                [
-                    { text: "NAME: " + name, options: { fontFace:'Arial', fontSize:10, bold:true } },
-                    { text: "MRN: " + mrn, options: { fontFace:'Arial', fontSize:10, bold:true } },
-                    { text: "IP: " + ip, options: { fontFace:'Arial', fontSize:10, bold:true } }
-                ],
-                // Row 2
-                [
-                    { text: "AGE: " + age, options: { fontFace:'Arial', fontSize:10, bold:true } },
-                    { text: "SEX: " + sex, options: { fontFace:'Arial', fontSize:10, bold:true } },
-                    { text: "R.NO: " + room, options: { fontFace:'Arial', fontSize:10, bold:true } }
-                ],
-                // Row 3 (Address - Spans 3 columns)
-                [
-                    { text: "ADDRESS: " + address + "\n\nPHONE: " + phone, options: { colspan: 3, fontFace:'Arial', fontSize:10, bold:true, align:'left' } }
-                ],
-                // Row 4
-                [
-                    { text: "D.O.A: 21/07/25 @ 05:57 PM", options: { fontFace:'Arial', fontSize:10, bold:true } },
-                    { text: "D.O.S: 21/07/25", options: { fontFace:'Arial', fontSize:10, bold:true } },
-                    { text: "D.O.D: 24/07/25 @ 03:00 PM", options: { fontFace:'Arial', fontSize:10, bold:true } }
-                ],
-                // Row 5 (Consultants - Spans 3 columns)
-                [
-                    { text: "CONSULTANTS: " + consultants, options: { colspan: 3, fontFace:'Arial', fontSize:10, bold:true } }
-                ],
-                // Row 6 (ICD - Spans 3 columns)
-                [
-                    { text: "ICD CODE: " + icd, options: { colspan: 3, fontFace:'Arial', fontSize:10, bold:true } }
-                ]
-            ];
-
-            // Add Table to Slide
-            slide.addTable(rows, {
-                x: 0.5, y: 2.2, w: 7.27,
-                colW: [3.2, 2.0, 2.07], // Column widths roughly matching 45%, 25%, 30%
-                border: { pt: 1, color: "000000" },
-                valign: "top"
-            });
-
-            // --- MEDICAL CONTENT (Lists) ---
-            // Helper to add list sections dynamically based on Y position
-            let currentY = 6.0; // Start below the table (approx)
-
-            function addSection(title, content) {
-                slide.addText(title, { x: 0.5, y: currentY, w: 7, h: 0.3, fontSize: 11, bold: true, underline: false });
-                currentY += 0.25;
-                
-                // Add bullets
-                let items = content.split('\n');
-                items.forEach(item => {
-                    if(item.trim() !== "") {
-                         slide.addText(item.trim(), { 
-                             x: 0.5, y: currentY, w: 7, h: 0.3, 
-                             fontSize: 11, bullet: true, indent: 20 
-                         });
-                         currentY += 0.25;
-                    }
-                });
-                currentY += 0.2; // Spacer
-            }
-
-            // Grab text content from the HTML elements
-            let diagText = document.getElementById('sec-diagnosis').innerText;
-            let procText = document.getElementById('sec-procedure').innerText;
-            let compText = document.getElementById('sec-complaints').innerText;
-            let histText = document.getElementById('sec-history').innerText;
-            let examText = document.getElementById('sec-exam').innerText;
-
-            addSection("DIAGNOSIS:", diagText);
-            addSection("PROCEDURE:", procText);
-            addSection("CHIEF COMPLAINTS:", compText);
-            addSection("PAST MEDICAL HISTORY:", histText);
-            addSection("ON EXAMINATION:", examText);
-
-            // 4. Save
-            pptx.writeFile({ fileName: "Editable_Discharge_Summary.pptx" });
+            /* Colors */
+            --color-green: #006400; /* Dark Green */
+            --color-red: #cc0000;
+            --color-black: #000000;
         }
-    </script>
+
+        body {
+            background-color: #333;
+            font-family: Arial, sans-serif; /* Standard Windows Print Font */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- LEFT SIDE: A4 PREVIEW --- */
+        .preview-area {
+            flex: 1;
+            overflow: auto;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            padding: 12mm 15mm; /* Calibrated margins */
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+            position: relative;
+            color: var(--color-black);
+            font-size: var(--base-font-size);
+            line-height: var(--line-height);
+        }
+
+        /* --- RIGHT SIDE: CONTROLS --- */
+        .controls-area {
+            width: 300px;
+            background: #f4f4f4;
+            border-left: 1px solid #ccc;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+        }
+        
+        .control-group { margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px; }
+        .control-group h3 { margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase; color: #555; }
+        .control-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; }
+        .control-row input[type="range"] { width: 120px; }
+        .control-row input[type="number"] { width: 50px; }
+
+        .btn-main {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        .btn-ppt { background: #d24726; color: white; }
+        .btn-print { background: #004e46; color: white; }
+
+        /* --- HEADER STYLES --- */
+        header { display: flex; justify-content: space-between; position: relative; margin-bottom: 15px; }
+        
+        .logo-wrapper { width: 100px; height: 90px; position: relative; }
+        .logo-wrapper img { width: 100%; height: 100%; object-fit: contain; }
+
+        .header-center { text-align: center; flex: 1; padding-top: 5px; transform: scale(var(--header-scale)); transform-origin: top center; }
+        .h-title { color: var(--color-green); font-size: 20pt; font-weight: 700; margin: 0; }
+        .h-line { width: 100%; height: 1px; background: #000; margin: 5px 0; }
+        .h-sub { color: #000; font-size: 13pt; font-weight: 700; margin: 0; }
+        .h-acc { color: var(--color-red); font-size: 11pt; font-weight: 700; margin-top: 2px; }
+
+        .doc-title { text-align: center; font-weight: 700; text-decoration: underline; font-size: 12pt; margin: 10px 0 15px 0; text-transform: uppercase; }
+
+        /* --- TABLE STYLES --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: var(--table-border-width) solid #000;
+            margin-bottom: 20px;
+            table-layout: fixed; /* STRICT COLUMNS */
+        }
+        td {
+            border: var(--table-border-width) solid #000;
+            padding: var(--cell-padding);
+            vertical-align: top;
+        }
+        
+        /* Column Widths (Adjustable via CSS Var if needed, but fixed for A4 usually) */
+        .c1 { width: 45%; } .c2 { width: 25%; } .c3 { width: 30%; }
+
+        /* The Label/Value aligner */
+        .lbl {
+            font-weight: 700;
+            display: inline-block;
+            width: var(--label-width); /* Key to alignment */
+            white-space: nowrap;
+        }
+        .val { font-weight: 600; display: inline; }
+
+        /* --- LIST STYLES --- */
+        .sec-title { font-weight: 700; text-transform: uppercase; margin-top: 15px; margin-bottom: 5px; font-size: 11.5pt; }
+        ul { margin: 0; padding-left: 25px; }
+        li { margin-bottom: 3px; font-weight: 500; }
+
+        /* Print Override */
+        @media print {
+            body { background: none; height: auto; display: block; }
+            .controls-area { display: none; }
+            .preview-area { padding: 0; display: block; }
+            .page { width: 100%; height: auto; box-shadow: none; padding: 15mm; margin: 0 auto; }
+        }
+    </style>
 </head>
 <body>
 
-    <div class="btn-container">
-        <button class="action-btn" onclick="generateEditablePPT()">Download Editable PPT</button>
-        <button class="action-btn print-btn" onclick="window.print()">Print / PDF</button>
-    </div>
+    <!-- PREVIEW AREA -->
+    <div class="preview-area">
+        <div class="page" id="document-content">
+            
+            <header>
+                <div class="logo-wrapper" id="logo1">
+                    <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
+                </div>
+                <div class="header-center">
+                    <div class="h-title" contenteditable="true">Valli Super Speciality Hospital</div>
+                    <div class="h-line"></div>
+                    <div class="h-sub" contenteditable="true">Valli Orthopaedic & Sports Hospital</div>
+                    <div class="h-acc" contenteditable="true">NABH Accredited</div>
+                </div>
+                <div class="logo-wrapper" id="logo2" style="margin-top: 35px;">
+                    <img src="nabh.png" alt="NABH" onerror="this.style.display='none'">
+                </div>
+            </header>
 
-    <div class="page">
-        <header>
-            <div class="logo-box">Left Logo</div>
-            <div class="header-center">
-                <h1 class="h-main" contenteditable="true">Valli Super Speciality Hospital</h1>
-                <div class="header-line"></div>
-                <h2 class="h-sub" contenteditable="true">Valli Orthopaedic & Sports Hospital</h2>
-                <div class="h-nabh" contenteditable="true">NABH Accredited</div>
-            </div>
-            <div class="logo-box">Right Logo</div>
-        </header>
+            <div class="doc-title" contenteditable="true">DISCHARGE SUMMARY</div>
 
-        <div class="doc-title">DISCHARGE SUMMARY</div>
-
-        <table>
-            <colgroup><col class="col-1"><col class="col-2"><col class="col-3"></colgroup>
-            <tr>
-                <td><span class="lbl-short">NAME</span>: <span class="val" id="val-name" contenteditable="true">Mr.TAMILSELVAN.D</span></td>
-                <td><span class="lbl-short">MRN.NO</span>: <span class="val" id="val-mrn" contenteditable="true">11948</span></td>
-                <td><span class="lbl-short">IP.NO</span>: <span class="val" id="val-ip" contenteditable="true">25000307</span></td>
-            </tr>
-            <tr>
-                <td><span class="lbl-short">AGE</span>: <span class="val" id="val-age" style="margin-left: 14px;" contenteditable="true">29 YEARS</span></td>
-                <td><span class="lbl-short">SEX</span>: <span class="val" id="val-sex" style="margin-left: 15px;" contenteditable="true">MALE</span></td>
-                <td><span class="lbl-short">R.NO</span>: <span class="val" id="val-room" contenteditable="true">IP-2</span></td>
-            </tr>
-            <tr>
-                <td colspan="3">
-                    <div style="margin-bottom: 5px;">
-                        <span class="lbl-short" style="width:85px;">ADDRESS :</span>
-                        <div class="val" id="val-address" style="margin-left: 85px; font-weight: 600; line-height: 1.4;" contenteditable="true">
-                            S/O.MR. DEVARAJI,
-                            PALLATHUR,
-                            ATHI PADI,
-                            UTHANGARAI,
-                            KRISHNAGIRI.
+            <table>
+                <colgroup><col class="c1"><col class="c2"><col class="c3"></colgroup>
+                <tr>
+                    <td><span class="lbl">NAME</span>: <span class="val" contenteditable="true">Mr.TAMILSELVAN.D</span></td>
+                    <td><span class="lbl" style="width: auto; margin-right:5px;">MRN.NO</span>: <span class="val" contenteditable="true">11948</span></td>
+                    <td><span class="lbl" style="width: auto; margin-right:5px;">IP.NO</span>: <span class="val" contenteditable="true">25000307</span></td>
+                </tr>
+                <tr>
+                    <td><span class="lbl">AGE</span>: <span class="val" contenteditable="true">29 YEARS</span></td>
+                    <td><span class="lbl" style="width: auto; margin-right:5px;">SEX</span>: <span class="val" contenteditable="true">MALE</span></td>
+                    <td><span class="lbl" style="width: auto; margin-right:5px;">R.NO</span>: <span class="val" contenteditable="true">IP-2</span></td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <div style="display:flex;">
+                            <span class="lbl">ADDRESS</span><span style="margin-right:4px;">:</span>
+                            <span class="val" contenteditable="true" style="display:block;">
+                                S/O.MR. DEVARAJI,<br>
+                                PALLATHUR,<br>
+                                ATHI PADI,<br>
+                                UTHANGARAI,<br>
+                                KRISHNAGIRI.
+                            </span>
                         </div>
-                    </div>
-                    <div>
-                        <span class="lbl-short">PHONE</span>: <span class="val" id="val-phone" contenteditable="true">9843904387</span>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td><span class="lbl-short">D.O.A</span>: <span class="val" contenteditable="true">21/07/25 @ 05:57 PM</span></td>
-                <td><span class="lbl-short">D.O.S</span>: <span class="val" contenteditable="true">21/07/25</span></td>
-                <td><span class="lbl-short">D.O.D</span>: <span class="val" contenteditable="true">24/07/25 @ 03:00 PM</span></td>
-            </tr>
-            <tr>
-                <td colspan="3">
-                    <span class="lbl-short">CONSULTANTS:</span>
-                    <div class="val" id="val-consultants" style="margin-left: 5px; display: inline-block; vertical-align: top;" contenteditable="true">
-                        DR.T.NATANASABAPATHY MBBS, M.S(ORTHO), FDFM, IOC DSM
-                        DR. AAKASH MBBS., M.S(ORTHO), FIJR, FDFM
-                        DR. S. PRADEEP MBBS, MD(ANESTHESIA)
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="3">
-                    <span class="lbl-short">ICD CODE</span>
-                    <span class="val" id="val-icd" style="margin-left: 150px;" contenteditable="true">M00.862</span>
-                </td>
-            </tr>
-        </table>
+                        <div style="margin-top: 5px;">
+                            <span class="lbl">PHONE</span>: <span class="val" contenteditable="true">9843904387</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="lbl">D.O.A</span>: <span class="val" contenteditable="true">21/07/25 @ 05:57 PM</span></td>
+                    <td><span class="lbl" style="width: auto; margin-right:5px;">D.O.S</span>: <span class="val" contenteditable="true">21/07/25</span></td>
+                    <td><span class="lbl" style="width: auto; margin-right:5px;">D.O.D</span>: <span class="val" contenteditable="true">24/07/25 @ 03:00 PM</span></td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <span class="lbl">CONSULTANTS</span>:
+                        <div class="val" style="display: inline-block; vertical-align: top; margin-left: 5px;" contenteditable="true">
+                            <div style="margin-bottom:2px;">DR.T.NATANASABAPATHY MBBS, M.S(ORTHO), FDFM, IOC DSM</div>
+                            <div style="margin-bottom:2px;">DR. AAKASH MBBS., M.S(ORTHO), FIJR, FDFM</div>
+                            <div>DR. S. PRADEEP MBBS, MD(ANESTHESIA)</div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <span class="lbl">ICD CODE</span> <span class="val" style="margin-left: 140px;" contenteditable="true">M00.862</span>
+                    </td>
+                </tr>
+            </table>
 
-        <div class="section-title">DIAGNOSIS:</div>
-        <ul id="sec-diagnosis" contenteditable="true">
-            <li><b>SEPTIC ARTHRITIS - LEFT KNEE</b></li>
-        </ul>
+            <div class="sec-title">DIAGNOSIS:</div>
+            <ul contenteditable="true">
+                <li><b>SEPTIC ARTHRITIS - LEFT KNEE</b></li>
+            </ul>
 
-        <div class="section-title">PROCEDURE:</div>
-        <ul id="sec-procedure" contenteditable="true">
-            <li><b>ARTHROSCOPIC DEBRIDEMENT - LEFT KNEE</b></li>
-        </ul>
+            <div class="sec-title">PROCEDURE:</div>
+            <ul contenteditable="true">
+                <li><b>ARTHROSCOPIC DEBRIDEMENT - LEFT KNEE</b></li>
+            </ul>
 
-        <div class="section-title">CHIEF COMPLAINTS:</div>
-        <ul id="sec-complaints" contenteditable="true">
-            <li>Patient came with discharging sinus over operated site</li>
-            <li>Patient came for planned debridement under arthroscopy</li>
-        </ul>
+            <div class="sec-title">CHIEF COMPLAINTS:</div>
+            <ul contenteditable="true">
+                <li>Patient came with discharging sinus over operated site</li>
+                <li>Patient came for planned debridement under arthroscopy</li>
+            </ul>
 
-        <div class="section-title">PAST MEDICAL HISTORY:</div>
-        <ul id="sec-history" contenteditable="true">
-            <li>Status post Left Arthroscopic ACL Reconstruction x 19 days old</li>
-            <li>Patient is typhoid positive since 14.07.2025 on medications</li>
-            <li>Patient denies other pre existing medical illness & allergies to any medications</li>
-        </ul>
+            <div class="sec-title">PAST MEDICAL HISTORY:</div>
+            <ul contenteditable="true">
+                <li>Status post Left Arthroscopic ACL Reconstruction x 19 days old</li>
+                <li>Patient is typhoid positive since 14.07.2025 on medications</li>
+                <li>Patient denies other pre existing medical illness & allergies to any medications</li>
+            </ul>
 
-        <div class="section-title">ON EXAMINATION:</div>
-        <ul id="sec-exam" contenteditable="true">
-            <li>Conscious, Oriented, Afebrile</li>
-            <li>Obese</li>
-        </ul>
+            <div class="sec-title">ON EXAMINATION:</div>
+            <ul contenteditable="true">
+                <li>Conscious, Oriented, Afebrile</li>
+                <li>Obese</li>
+            </ul>
 
+        </div>
     </div>
 
+    <!-- CONTROLS AREA -->
+    <div class="controls-area">
+        <h2 style="text-align: center; margin-top: 0;">LAYOUT TUNER</h2>
+        
+        <button class="btn-main btn-ppt" onclick="generatePPT()">Download Editable PPT</button>
+        <button class="btn-main btn-print" onclick="window.print()">Print / PDF</button>
+
+        <div class="control-group">
+            <h3>Fonts & Spacing</h3>
+            <div class="control-row">
+                <span>Font Size (pt)</span>
+                <input type="range" min="8" max="16" step="0.5" value="11.5" oninput="setVar('--base-font-size', this.value + 'pt')">
+            </div>
+            <div class="control-row">
+                <span>Line Height</span>
+                <input type="range" min="1" max="2" step="0.05" value="1.3" oninput="setVar('--line-height', this.value)">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h3>Alignment</h3>
+            <div class="control-row">
+                <span>Label Width (px)</span>
+                <input type="range" min="50" max="150" value="80" oninput="setVar('--label-width', this.value + 'px')">
+            </div>
+            <div class="control-row">
+                <span>Cell Padding</span>
+                <input type="range" min="0" max="15" value="4" oninput="setVar('--cell-padding', this.value + 'px')">
+            </div>
+            <div class="control-row">
+                <span>Header Scale</span>
+                <input type="range" min="0.5" max="1.5" step="0.1" value="1" oninput="setVar('--header-scale', this.value)">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h3>Move Logos</h3>
+            <div class="control-row">
+                <span>Left X</span>
+                <input type="number" value="0" oninput="moveLogo('logo1', 'left', this.value)">
+            </div>
+            <div class="control-row">
+                <span>Left Y</span>
+                <input type="number" value="0" oninput="moveLogo('logo1', 'top', this.value)">
+            </div>
+            <div class="control-row">
+                <span>Right X</span>
+                <input type="number" value="0" oninput="moveLogo('logo2', 'left', this.value)">
+            </div>
+            <div class="control-row">
+                <span>Right Y</span>
+                <input type="number" value="35" oninput="moveLogo('logo2', 'marginTop', this.value)">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setVar(name, value) {
+            document.documentElement.style.setProperty(name, value);
+        }
+
+        function moveLogo(id, prop, val) {
+            const el = document.getElementById(id);
+            el.style[prop] = val + "px";
+        }
+
+        function generatePPT() {
+            // This function scrapes the CURRENT DOM state, including user edits
+            try {
+                let pptx = new PptxGenJS();
+                pptx.layout = 'A4';
+                let slide = pptx.addSlide();
+
+                // HEADER
+                slide.addText("Valli Super Speciality Hospital", { x:1.5, y:0.5, w:5.27, fontSize:22, bold:true, color:'006400', align:'center' });
+                slide.addShape(pptx.ShapeType.line, { x:1.6, y:0.9, w:5.0, h:0, line:{color:'000000', width:1} });
+                slide.addText("Valli Orthopaedic & Sports Hospital", { x:1.5, y:1.0, w:5.27, fontSize:14, bold:true, color:'000000', align:'center' });
+                slide.addText("NABH Accredited", { x:1.5, y:1.25, w:5.27, fontSize:12, bold:true, color:'cc0000', align:'center' });
+                slide.addText("DISCHARGE SUMMARY", { x:0.5, y:1.7, w:7.27, fontSize:12, bold:true, underline:true, align:'center' });
+
+                // TABLE - We scrape specific cells for simplicity
+                // Note: For a true WYSIWYG PPT export, complex parsing is needed. 
+                // This is a robust approximation using the text content.
+                
+                // Helper to get text from cells roughly
+                const getTxt = (selector) => {
+                   let el = document.querySelector(selector);
+                   return el ? el.innerText.replace(/\n/g, " ") : "";
+                };
+
+                let rows = [
+                    [
+                        { text: "NAME: Mr.TAMILSELVAN.D", options:{bold:true, fontSize:10} },
+                        { text: "MRN: 11948", options:{bold:true, fontSize:10} },
+                        { text: "IP: 25000307", options:{bold:true, fontSize:10} }
+                    ],
+                    [
+                        { text: "AGE: 29 YEARS", options:{bold:true, fontSize:10} },
+                        { text: "SEX: MALE", options:{bold:true, fontSize:10} },
+                        { text: "R.NO: IP-2", options:{bold:true, fontSize:10} }
+                    ],
+                    [
+                        { text: "ADDRESS: S/O MR. DEVARAJI, PALLATHUR...\nPHONE: 9843904387", options:{colspan:3, bold:true, fontSize:10} }
+                    ],
+                    [
+                        { text: "D.O.A: 21/07/25", options:{bold:true, fontSize:10} },
+                        { text: "D.O.S: 21/07/25", options:{bold:true, fontSize:10} },
+                        { text: "D.O.D: 24/07/25", options:{bold:true, fontSize:10} }
+                    ],
+                    [
+                        { text: "CONSULTANTS: DR. T. NATANASABAPATHY...", options:{colspan:3, bold:true, fontSize:10} }
+                    ],
+                    [
+                        { text: "ICD CODE: M00.862", options:{colspan:3, bold:true, fontSize:10} }
+                    ]
+                ];
+
+                slide.addTable(rows, {
+                    x:0.5, y:2.1, w:7.27,
+                    colW: [3.2, 2.0, 2.07],
+                    border: {pt:1, color:'000000'},
+                    valign:'top'
+                });
+
+                // BODY CONTENT
+                let yPos = 6.2;
+                let sections = document.querySelectorAll('.sec-title');
+                let lists = document.querySelectorAll('ul');
+
+                for(let i=0; i<sections.length; i++) {
+                    slide.addText(sections[i].innerText, { x:0.5, y:yPos, w:7, fontSize:10, bold:true });
+                    yPos += 0.25;
+                    let items = lists[i].querySelectorAll('li');
+                    items.forEach(li => {
+                        slide.addText(li.innerText, { x:0.5, y:yPos, w:7, fontSize:10, bullet:true, indent:15 });
+                        yPos += 0.25;
+                    });
+                    yPos += 0.15;
+                }
+
+                pptx.writeFile({ fileName: "Discharge_Summary.pptx" });
+            } catch(e) {
+                alert("Error: " + e.message);
+            }
+        }
+    </script>
 </body>
 </html>
