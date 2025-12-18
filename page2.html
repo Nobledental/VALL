@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hospital Form - 7 Col 33 Rows Exact</title>
+    <!-- Script for PowerPoint Generation -->
     <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     
@@ -25,23 +26,27 @@
 
         .btn-container {
             margin-bottom: 20px;
+            display: flex;
+            gap: 15px; /* Space between buttons */
         }
 
         button {
-            background-color: var(--green-border);
             color: white;
             border: none;
-            padding: 12px 30px;
-            font-size: 16px;
+            padding: 12px 25px;
+            font-size: 14px;
             font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: background 0.3s;
         }
 
-        button:hover {
-            background-color: #113824;
-        }
+        .btn-ppt { background-color: var(--green-border); }
+        .btn-ppt:hover { background-color: #113824; }
+
+        .btn-doc { background-color: #2b579a; } /* Word Blue */
+        .btn-doc:hover { background-color: #1e3f72; }
 
         /* Paper Layout */
         .sheet {
@@ -107,10 +112,12 @@
 <body>
 
     <div class="btn-container">
-        <button onclick="exportStrictPPT()">Download Editable PPT (7 Col / 33 Row)</button>
+        <button class="btn-ppt" onclick="exportStrictPPT()">Download PowerPoint (.pptx)</button>
+        <button class="btn-doc" onclick="exportDoc()">Download Word Doc (.doc)</button>
     </div>
 
-    <div class="sheet">
+    <!-- The exact HTML to be exported -->
+    <div class="sheet" id="printableArea">
         <table>
             <colgroup>
                 <col class="col-label">
@@ -171,106 +178,151 @@
     </div>
 
     <script>
+        // --- PPT EXPORT FUNCTION ---
         function exportStrictPPT() {
-            let pres = new PptxGenJS();
-            
-            // --- CONSTANTS ---
-            const C_GREEN = "1a5236";
-            
-            // --- STYLES ---
-            const borderOpts = { type: 'solid', color: C_GREEN, pt: 0.75 };
-            
-            const stBase = { fontFace: "Arial", fontSize: 10, color: "000000", valign: "middle" };
-            const stBold = { ...stBase, bold: true };
-            const stSub = { ...stBase, fontSize: 10 }; // Regular weight
-            
-            // Helper for Empty Cells
-            const empty = () => ({ text: "", options: { border: borderOpts } });
-            const sixEmpties = [empty(), empty(), empty(), empty(), empty(), empty()];
+            try {
+                if (typeof PptxGenJS === 'undefined') {
+                    alert("PowerPoint library is still loading. Please wait a moment and try again.");
+                    return;
+                }
 
-            // --- DATA CONSTRUCTION ---
-            let rows = [];
-
-            // 1. Header Row (Placeholder for Overlay)
-            // We create a row that spans all columns to hold space for the title
-            rows.push([
-                { text: "", options: { colspan: 7, border: { color: C_GREEN, pt: 0.1 }, h: 0.6 } }, 
-                null, null, null, null, null, null
-            ]);
-
-            // Helper to build rows
-            const buildRow = (txt, isBold=true) => {
-                let opt = isBold ? stBold : stSub;
-                return [
-                    { text: txt, options: { ...opt, border: borderOpts, align: 'left' } },
-                    ...sixEmpties
-                ];
-            };
-
-            // 2. Exact Data Rows (No extra padding or section dividers)
-            rows.push(...[
-                buildRow("DATE:"),
-                buildRow("TIME:"),
-                buildRow("FROM:"),
-                buildRow("TO:"),
-                buildRow("PURPOSE:"),
+                let pres = new PptxGenJS();
                 
-                buildRow("VITALS:"),
-                buildRow("TEMP"),
-                buildRow("PULSE"),
-                buildRow("B.P"),
-                buildRow("SPO2"),
-                buildRow("R.R"),
+                // --- CONSTANTS ---
+                const C_GREEN = "1a5236";
                 
-                buildRow("INVESTIGATION"),
-                buildRow("  a) Blood test reports", false),
-                buildRow("  b) C/S reports", false),
-                buildRow("  c) Pus culture reports", false),
-                buildRow("  d) Others specimen reports", false),
-                buildRow("  e) Biopsy reports", false),
-                buildRow("X-RAY"),
-                buildRow("CT-SCAN, MRI"),
-                buildRow("USG"),
-                buildRow("DOPPLER"),
-                buildRow("ECHO"),
-                buildRow("OTHERS"),
-                buildRow("  Others: e.g. E.T, Cvp...", false),
+                // --- STYLES ---
+                const borderOpts = { type: 'solid', color: C_GREEN, pt: 0.75 };
                 
-                buildRow("TAKEN OVER NURSE SIGN"),
-                buildRow("HAND OVER NURSE SIGN"),
+                const stBase = { fontFace: "Arial", fontSize: 10, color: "000000", valign: "middle" };
+                const stBold = { ...stBase, bold: true };
+                const stSub = { ...stBase, fontSize: 10 }; // Regular weight
                 
-                // 6 Blank Rows
-                buildRow(" ", false),
-                buildRow(" ", false),
-                buildRow(" ", false),
-                buildRow(" ", false),
-                buildRow(" ", false),
-                buildRow(" ", false)
-            ]);
+                // Helper for Empty Cells
+                const empty = () => ({ text: "", options: { border: borderOpts } });
+                const sixEmpties = [empty(), empty(), empty(), empty(), empty(), empty()];
 
-            // --- GENERATE SLIDE ---
-            let slide = pres.addSlide();
+                // --- DATA CONSTRUCTION ---
+                let rows = [];
 
-            // Draw Table
-            slide.addTable(rows, {
-                x: 0.5, y: 0.5,
-                w: 9.0, // Fits A4ish landscape on slide
-                colW: [3.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], // Exact 7 columns
-                rowH: 0.22, // Uniform height
-                border: borderOpts
-            });
+                // 1. Header Row (Placeholder for Overlay)
+                rows.push([
+                    { text: "", options: { colspan: 7, border: { color: C_GREEN, pt: 0.1 }, h: 0.6 } }, 
+                    null, null, null, null, null, null
+                ]);
 
-            // Draw Header Capsule (Overlay)
-            // Calculated Center: TableX (0.5) + (TableWidth 9.0 - ShapeWidth 3.4) / 2 = 0.5 + 2.8 = 3.3
-            slide.addShape(pres.ShapeType.roundRect, {
-                text: { text: "TRANSFER INSIDE THE HOSPITAL", options: { color: C_GREEN, bold: true, fontSize: 12 } },
-                x: 3.3, y: 0.62, w: 3.4, h: 0.35,
-                fill: { color: "FFFFFF" },
-                line: { color: C_GREEN, width: 1.5 },
-                rectRadius: 1
-            });
+                // Helper to build rows
+                const buildRow = (txt, isBold=true) => {
+                    let opt = isBold ? stBold : stSub;
+                    return [
+                        { text: txt, options: { ...opt, border: borderOpts, align: 'left' } },
+                        ...sixEmpties
+                    ];
+                };
 
-            pres.writeFile({ fileName: "Hospital_Transfer_Form_Exact.pptx" });
+                // 2. Exact Data Rows
+                rows.push(...[
+                    buildRow("DATE:"),
+                    buildRow("TIME:"),
+                    buildRow("FROM:"),
+                    buildRow("TO:"),
+                    buildRow("PURPOSE:"),
+                    
+                    buildRow("VITALS:"),
+                    buildRow("TEMP"),
+                    buildRow("PULSE"),
+                    buildRow("B.P"),
+                    buildRow("SPO2"),
+                    buildRow("R.R"),
+                    
+                    buildRow("INVESTIGATION"),
+                    buildRow("  a) Blood test reports", false),
+                    buildRow("  b) C/S reports", false),
+                    buildRow("  c) Pus culture reports", false),
+                    buildRow("  d) Others specimen reports", false),
+                    buildRow("  e) Biopsy reports", false),
+                    buildRow("X-RAY"),
+                    buildRow("CT-SCAN, MRI"),
+                    buildRow("USG"),
+                    buildRow("DOPPLER"),
+                    buildRow("ECHO"),
+                    buildRow("OTHERS"),
+                    buildRow("  Others: e.g. E.T, Cvp...", false),
+                    
+                    buildRow("TAKEN OVER NURSE SIGN"),
+                    buildRow("HAND OVER NURSE SIGN"),
+                    
+                    // 6 Blank Rows
+                    buildRow(" ", false),
+                    buildRow(" ", false),
+                    buildRow(" ", false),
+                    buildRow(" ", false),
+                    buildRow(" ", false),
+                    buildRow(" ", false)
+                ]);
+
+                // --- GENERATE SLIDE ---
+                let slide = pres.addSlide();
+
+                // Draw Table
+                slide.addTable(rows, {
+                    x: 0.5, y: 0.5,
+                    w: 9.0, // Fits A4ish landscape on slide
+                    colW: [3.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], // Exact 7 columns
+                    rowH: 0.22, // Uniform height
+                    border: borderOpts
+                });
+
+                // Draw Header Capsule (Overlay)
+                slide.addShape(pres.ShapeType.roundRect, {
+                    text: { text: "TRANSFER INSIDE THE HOSPITAL", options: { color: C_GREEN, bold: true, fontSize: 12 } },
+                    x: 3.3, y: 0.62, w: 3.4, h: 0.35,
+                    fill: { color: "FFFFFF" },
+                    line: { color: C_GREEN, width: 1.5 },
+                    rectRadius: 1
+                });
+
+                pres.writeFile({ fileName: "Hospital_Transfer_Form_Exact.pptx" });
+            } catch (err) {
+                console.error(err);
+                alert("An error occurred while exporting PPT. Please check console for details.");
+            }
+        }
+
+        // --- DOC EXPORT FUNCTION ---
+        function exportDoc() {
+            var header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
+                         "xmlns:w='urn:schemas-microsoft-com:office:word' " +
+                         "xmlns='http://www.w3.org/TR/REC-html40'>" +
+                         "<head><meta charset='utf-8'><title>Export HTML to Word Document with CSS</title></head><body>";
+            
+            var footer = "</body></html>";
+            
+            // Get the HTML of the table
+            var sourceHTML = header + document.getElementById("printableArea").innerHTML + footer;
+
+            // Embed Styles for Word
+            // Note: Word doesn't support external CSS well, so we embed vital styles
+            var styles = `
+                <style>
+                    table { width: 100%; border-collapse: collapse; border: 2px solid #1a5236; font-family: Arial, sans-serif; }
+                    td { border: 1px solid #1a5236; padding: 2px 5px; font-size: 11px; height: 22px; color: black; }
+                    .header-row td { text-align: center; height: 40px; border-bottom: 2px solid #1a5236; }
+                    .capsule { display: inline-block; border: 2px solid #1a5236; border-radius: 20px; padding: 4px 15px; color: #1a5236; font-weight: bold; font-size: 13px; text-transform: uppercase; background: white; }
+                    .bold { font-weight: bold; }
+                    .sub { padding-left: 10px; }
+                </style>
+            `;
+            
+            sourceHTML = header + styles + document.getElementById("printableArea").innerHTML + footer;
+            
+            var source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+            var fileDownload = document.createElement("a");
+            document.body.appendChild(fileDownload);
+            fileDownload.href = source;
+            fileDownload.download = 'Hospital_Transfer_Form.doc';
+            fileDownload.click();
+            document.body.removeChild(fileDownload);
         }
     </script>
 </body>
