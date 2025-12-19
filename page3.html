@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valli Hospital Bill - Exact Match</title>
+    <style>
+        /* --- Page & Base Setup --- */
+        @media print {
+            @page { size: A4; margin: 0; }
+            body { margin: 0; padding: 0; background: white; }
+            .sheet { box-shadow: none !important; margin: 0 !important; width: 210mm !important; height: 297mm !important; border: none !important; }
+            .no-print { display: none !important; }
+            input { background: transparent !important; }
+        }
+
+        body {
+            background-color: #555;
+            font-family: Arial, Helvetica, sans-serif; /* Matches the scan font */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .sheet {
+            background-color: white;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 12mm 15mm; /* Margins estimated from scan */
+            box-sizing: border-box;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            position: relative;
+            color: #000;
+        }
+
+        /* --- Typography Helpers --- */
+        .bold { font-weight: bold; }
+        .center { text-align: center; }
+        .right { text-align: right; }
+        .uppercase { text-transform: uppercase; }
+        
+        /* Input Styling (Invisible but Editable) */
+        input {
+            border: none;
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: inherit;
+            color: inherit;
+            background: transparent;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+            outline: none;
+        }
+        input:focus { background-color: #eef; }
+        
+        /* Helper to hide number arrows */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
+        /* --- Header Section --- */
+        .hospital-name {
+            font-size: 18px;
+            margin-bottom: 4px;
+            letter-spacing: 0.2px;
+        }
+        .address-line {
+            font-size: 11px;
+            line-height: 1.4;
+        }
+        .header-divider {
+            border-bottom: 1px solid #000;
+            margin-top: 8px;
+            margin-bottom: 6px;
+            width: 100%;
+        }
+        .bill-title {
+            font-size: 13px;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- Patient Info Grid --- */
+        .patient-info {
+            width: 100%;
+            font-size: 11px;
+            line-height: 1.45;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .info-col-left { width: 60%; }
+        .info-col-right { width: 40%; padding-left: 20px; }
+
+        .info-row { display: flex; align-items: flex-start; }
+        .label { width: 95px; flex-shrink: 0; font-weight: normal; } /* Label width tuned to image */
+        .val { flex-grow: 1; }
+
+        /* --- Table Styling --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        /* Table Header */
+        thead th {
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            padding: 5px 0;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        /* Table Body */
+        tbody tr td {
+            padding: 3px 0; /* Tighter padding to match dense list */
+            vertical-align: top;
+        }
+
+        /* Category Headers */
+        .cat-row td {
+            padding-top: 10px;
+            padding-bottom: 2px;
+        }
+        .cat-title {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        /* Column Widths (Tuned to image) */
+        .c-desc { width: 52%; }
+        .c-date { width: 18%; }
+        .c-price { width: 12%; text-align: right; }
+        .c-qty { width: 6%; text-align: center; }
+        .c-total { width: 12%; text-align: right; }
+
+        /* --- Footer --- */
+        .footer-divider {
+            border-top: 1px solid #000;
+            margin-top: 5px;
+            padding-top: 8px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .netbill-label {
+            font-weight: bold;
+            margin-right: 80px; /* Adjust to place "NetBill" text correctly */
+        }
+        .netbill-amount {
+            font-weight: bold;
+            width: 100px; /* approximate width of total column */
+            text-align: right;
+        }
+
+        /* Print Button */
+        .btn {
+            position: fixed; top: 20px; right: 20px;
+            padding: 10px 20px; background: #333; color: #fff;
+            border: none; cursor: pointer; border-radius: 4px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <button class="btn no-print" onclick="window.print()">Print / Save as PDF</button>
+
+    <div class="sheet">
+        <div class="center">
+            <div class="hospital-name bold uppercase" contenteditable="true">VALLI ORTHOPEDIC & SPORTS HOSPITAL</div>
+            <div class="address-line" contenteditable="true">
+                Opp to Vidya Mandir School, Meyyanur, Salem - 636004,<br>
+                Mobile: +91 90034 17111E: Info@Valliorthosportshospital.Com
+            </div>
+        </div>
+
+        <div class="header-divider"></div>
+
+        <div class="center bold uppercase bill-title">FINAL BILL</div>
+
+        <div class="patient-info">
+            <div class="info-col-left">
+                <div class="info-row"><div class="label bold">MRN</div><div class="val">: 11265</div></div>
+                <div class="info-row"><div class="label bold">Patient Name</div><div class="val" contenteditable="true">: Mrs.RANI.L</div></div>
+                <div class="info-row"><div class="label bold">Gender/Age</div><div class="val" contenteditable="true">: 56Y/F</div></div>
+                <div class="info-row"><div class="label bold">Contact No</div><div class="val" contenteditable="true">: 9361266389</div></div>
+                <div class="info-row"><div class="label bold">Address</div><div class="val" contenteditable="true">: W/o. RAVICHANDRAN<br>52G/182, 6 TH STREET MEYAR NAGAR,,<br>PERAMANUREAST,HASTHAMPATTY,SALEM</div></div>
+                <div class="info-row" style="margin-top: 8px;"><div class="label bold">Consultant</div><div class="val" contenteditable="true">: Dr. T.NATANASABAPATHY MBBS.M.S.(Ortho),FDFM,IOC DSM</div></div>
+            </div>
+            <div class="info-col-right">
+                <div class="info-row"><div class="label bold">IP No</div><div class="val" contenteditable="true">: IP/25000130</div></div>
+                <div class="info-row"><div class="label bold">Admission Time</div><div class="val" contenteditable="true">: 17/05/2025 03:39 PM</div></div>
+                <div class="info-row"><div class="label bold">Discharge Time</div><div class="val" contenteditable="true">: 19/05/2025 05:00PM</div></div>
+            </div>
+        </div>
+
+        <table id="billTable">
+            <thead>
+                <tr>
+                    <th class="c-desc">Service Description</th>
+                    <th class="c-date">Service Date</th>
+                    <th class="c-price">Price</th>
+                    <th class="c-qty">Qty</th>
+                    <th class="c-total">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="cat-row"><td colspan="5"><span class="cat-title" contenteditable="true">Consultation Fee</span></td></tr>
+                
+                <tr class="item-row">
+                    <td><input value="Dr.SIVASUBRAMANIYAM .P MBBS MD ()"></td>
+                    <td><input value="19/05/25 -19/05/25"></td> <td><input type="number" class="price" value="1500.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="2" style="text-align:center;"></td>
+                    <td class="right total">3000.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="Dr.SANTHOSH M.D () ANESTHISIA"></td>
+                    <td><input value="19/05/25"></td>
+                    <td><input type="number" class="price" value="10000.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">10000.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="Dr.T.NATANASABAPATHYMBBS.M.S.(Ortho),FDFM,IOC"></td>
+                    <td><input value="19/05/25 -19/05/25"></td>
+                    <td><input type="number" class="price" value="1500.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="3" style="text-align:center;"></td>
+                    <td class="right total">4500.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="DSM ()"></td> <td></td><td></td><td></td><td></td>
+                </tr>
+
+                <tr class="cat-row"><td colspan="5"><span class="cat-title" contenteditable="true">Investigation Fee</span></td></tr>
+
+                <tr class="item-row">
+                    <td><input value="FITNESS PROFILE - II"></td>
+                    <td><input value="17/05/25"></td>
+                    <td><input type="number" class="price" value="4500.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">4500.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="CBC"></td>
+                    <td><input value="18/05/25"></td>
+                    <td><input type="number" class="price" value="250.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">250.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="PERIPHERAL SMEAR"></td>
+                    <td><input value="18/05/25"></td>
+                    <td><input type="number" class="price" value="400.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">400.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="SERUM FERRITIN"></td>
+                    <td><input value="18/05/25"></td>
+                    <td><input type="number" class="price" value="800.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">800.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="VITAMIN B12"></td>
+                    <td><input value="18/05/25"></td>
+                    <td><input type="number" class="price" value="900.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">900.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="PLATELET COUNT"></td>
+                    <td><input value="19/05/25"></td>
+                    <td><input type="number" class="price" value="100.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">100.00</td>
+                </tr>
+
+                <tr class="cat-row"><td colspan="5"><span class="cat-title" contenteditable="true">Services</span></td></tr>
+
+                <tr class="item-row">
+                    <td><input value="X-RAY CHEST PA"></td>
+                    <td><input value="19/05/25"></td>
+                    <td><input type="number" class="price" value="400.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">400.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="X-RAY KNEE STANDING AP BOTH NEE"></td>
+                    <td><input value="19/05/25"></td>
+                    <td><input type="number" class="price" value="400.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">400.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="BLOOD TRANSFUSION CHARGES"></td>
+                    <td><input value="19/05/25"></td>
+                    <td><input type="number" class="price" value="1500.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="2" style="text-align:center;"></td>
+                    <td class="right total">3000.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="SUGAR TEST(CBG)"></td>
+                    <td><input value="19/05/25 -19/05/25"></td>
+                    <td><input type="number" class="price" value="100.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="5" style="text-align:center;"></td>
+                    <td class="right total">500.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="PHYSIO CHARGES - IP"></td>
+                    <td><input value="19/05/25 -19/05/25"></td>
+                    <td><input type="number" class="price" value="500.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="2" style="text-align:center;"></td>
+                    <td class="right total">1000.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="SURGEONFEE-Dr.AAKASH.EMBBS.,M.S.ORTHO,FIJR"></td>
+                    <td><input value="19/05/25"></td>
+                    <td><input type="number" class="price" value="10000.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">10000.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="MBBS.,M.S.ORTHO,FIJR"></td> <td></td><td></td><td></td><td></td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="PROCEDURECHARGES-Dr.T.NATANASABAPATHY"></td>
+                    <td><input value="19/05/25 -19/05/25"></td>
+                    <td><input type="number" class="price" value="35000.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">35000.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="MBBS.M.S.(Ortho),FDFM,IOC DSM"></td> <td></td><td></td><td></td><td></td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="MISCELLANEOUS"></td>
+                    <td><input value="19/05/25 -19/05/25"></td>
+                    <td><input type="number" class="price" value="2000.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">2000.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="OT CHARGES"></td>
+                    <td><input value="19/05/25 -19/05/25"></td>
+                    <td><input type="number" class="price" value="17500.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">17500.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="DUTY MEDICAL OFFICER"></td>
+                    <td><input value="19/05/25 -19/05/25"></td>
+                    <td><input type="number" class="price" value="1000.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="2" style="text-align:center;"></td>
+                    <td class="right total">2000.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="PHARMACY CHARGES"></td>
+                    <td><input value="19/05/25"></td>
+                    <td><input type="number" class="price" value="14517.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">14517.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="DELUXE CHARGES"></td>
+                    <td><input value="17/05/25 19/05/25"></td> <td><input type="number" class="price" value="2500.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="2.5" step="0.1" style="text-align:center;"></td>
+                    <td class="right total">6250.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="DELUXE - NURSING"></td>
+                    <td><input value="17/05/25 19/05/25"></td>
+                    <td><input type="number" class="price" value="500.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="2.5" step="0.1" style="text-align:center;"></td>
+                    <td class="right total">1250.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="DELUXE - HOUSEKEEPING"></td>
+                    <td><input value="17/05/25 19/05/25"></td>
+                    <td><input type="number" class="price" value="200.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="2.5" step="0.1" style="text-align:center;"></td>
+                    <td class="right total">500.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="DELUXE - LAUNDRY CHARGES"></td>
+                    <td><input value="17/05/25 19/05/25"></td>
+                    <td><input type="number" class="price" value="200.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="2.5" step="0.1" style="text-align:center;"></td>
+                    <td class="right total">500.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="DELUXE - BMW CHARGES"></td>
+                    <td><input value="17/05/25 19/05/25"></td>
+                    <td><input type="number" class="price" value="300.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="2.5" step="0.1" style="text-align:center;"></td>
+                    <td class="right total">700.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="DELUXE - DRESSING CHARGES"></td>
+                    <td><input value="17/05/25 19/05/25"></td>
+                    <td><input type="number" class="price" value="1000.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">1000.00</td>
+                </tr>
+                <tr class="item-row">
+                    <td><input value="ECG"></td>
+                    <td><input value="19/05/25"></td>
+                    <td><input type="number" class="price" value="200.00" style="text-align:right;"></td>
+                    <td><input type="number" class="qty" value="1" style="text-align:center;"></td>
+                    <td class="right total">200.00</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="footer-divider">
+            <span class="netbill-label">NetBill:</span>
+            <span class="netbill-amount" id="grandTotal">121167.00</span>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const table = document.getElementById('billTable');
+            const grandTotalEl = document.getElementById('grandTotal');
+
+            const calculateTotals = () => {
+                let grandTotal = 0;
+                table.querySelectorAll('.item-row').forEach(row => {
+                    const priceInput = row.querySelector('.price');
+                    const qtyInput = row.querySelector('.qty');
+                    const totalCell = row.querySelector('.total');
+
+                    if (priceInput && qtyInput && totalCell) {
+                        const price = parseFloat(priceInput.value) || 0;
+                        const qty = parseFloat(qtyInput.value) || 0;
+                        const rowTotal = price * qty;
+                        totalCell.textContent = rowTotal.toFixed(2);
+                        grandTotal += rowTotal;
+                    }
+                });
+                grandTotalEl.textContent = grandTotal.toFixed(2);
+            };
+
+            table.addEventListener('input', (e) => {
+                if(e.target.classList.contains('price') || e.target.classList.contains('qty')) {
+                    calculateTotals();
+                }
+            });
+            
+            // Initial run
+            calculateTotals();
+        });
+    </script>
+</body>
+</html>
